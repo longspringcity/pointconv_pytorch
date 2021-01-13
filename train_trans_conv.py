@@ -164,7 +164,6 @@ def main(args):
             distance = torch.norm(diff, dim=1)
             correct = torch.sum(distance < 0.2)
             mean_correct.append(correct.item() / float(points.size()[0]))
-            print(mean_correct)
             loss.backward()
             optimizer.step()
             global_step += 1
