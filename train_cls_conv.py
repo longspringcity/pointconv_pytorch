@@ -36,7 +36,7 @@ def parse_args():
     parser.add_argument('--normal', action='store_true', default=False,
                         help='Whether to use normal information [default: False]')
     # parser.add_argument('--normal', default=True, help='Whether to use normal information')
-    # return parser.parse_args()
+    return parser.parse_args()
 
 
 def main(args):
