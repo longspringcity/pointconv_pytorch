@@ -135,10 +135,10 @@ def main(args):
             points_set[:, :, 0:3] = jittered_data
             points_set[:, :1024, :] = provider.random_point_dropout_v2(points_set[:, :1024, :])
             points = torch.Tensor(points_set[:, :1024, :])
-            target = torch.Tensor(points_set[:, 1024:, :])
+            target = torch.Tensor(points_set[:, 1024, :])
 
             # vis_point = points[0, :, :].data.numpy()
-            # vis_target = target[0, :, :]
+            # vis_target = target
             # vis_point_cloud = o3d.PointCloud()
             # vis_point_cloud.points = o3d.Vector3dVector(vis_point)
             # vis_point_cloud.paint_uniform_color([1, 0, 0])
@@ -147,15 +147,21 @@ def main(args):
             # vis_target_cloud.paint_uniform_color([0, 0, 0])
             # o3d.draw_geometries([vis_point_cloud, vis_target_cloud])
 
+            points = points.transpose(2, 1)
             points, target = points.cuda(), target.cuda()
             optimizer.zero_grad()
 
             estimator = estimator.train()
             # pred = classifier(points[:, :3, :], points[:, 3:, :])
             pred = estimator(points[:, :3, :], None)
-            loss = F.nll_loss(pred, target.long())
-            pred_choice = pred.data.max(1)[1]
-            correct = pred_choice.eq(target.long().data).cpu().sum()
+            print(pred.shape)
+            print(target.shape)
+            loss = F.mse_loss(pred, target.long())
+            diff = pred - target.long()
+            distance = torch.norm(diff, dim=1)
+            print(distance.shape)
+            exit()
+            correct = distance
             mean_correct.append(correct.item() / float(points.size()[0]))
             loss.backward()
             optimizer.step()
