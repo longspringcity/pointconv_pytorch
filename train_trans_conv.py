@@ -169,6 +169,7 @@ def main(args):
             global_step += 1
 
         train_acc = np.mean(mean_correct)
+        print('Train Accuracy: %f' % train_acc)
         logger.info('Train Accuracy: %f' % train_acc)
 
         acc = trans_test(estimator, testDataLoader)
