@@ -14,7 +14,7 @@ from tqdm import tqdm
 import provider
 from data_utils.TranslationDataLoader import TranslationDataLoader
 from model.pointconv_trans import PointConvDensityTrans as PointConvTrans
-from utils.utils import test, save_checkpoint
+from utils.utils import trans_test, save_checkpoint
 import open3d as o3d
 
 
@@ -154,14 +154,10 @@ def main(args):
             estimator = estimator.train()
             # pred = classifier(points[:, :3, :], points[:, 3:, :])
             pred = estimator(points[:, :3, :], None)
-            print(pred.shape)
-            print(target.shape)
-            loss = F.mse_loss(pred, target.long())
-            diff = pred - target.long()
+            loss = F.mse_loss(pred, target)
+            diff = pred - target
             distance = torch.norm(diff, dim=1)
-            print(distance.shape)
-            exit()
-            correct = distance
+            correct = torch.sum(distance < 0.2)
             mean_correct.append(correct.item() / float(points.size()[0]))
             loss.backward()
             optimizer.step()
@@ -171,7 +167,7 @@ def main(args):
         print('Train Accuracy: %f' % train_acc)
         logger.info('Train Accuracy: %f' % train_acc)
 
-        acc = test(estimator, testDataLoader)
+        acc = trans_test(estimator, testDataLoader)
 
         if (acc >= best_tst_accuracy) and epoch > 5:
             best_tst_accuracy = acc

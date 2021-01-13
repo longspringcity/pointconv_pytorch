@@ -61,6 +61,26 @@ def test(model, loader):
     accuracy = total_correct / total_seen
     return accuracy
 
+def trans_test(model, loader):
+    total_correct = 0.0
+    total_seen = 0.0
+    for j, data in enumerate(loader, 0):
+        points, target = data
+        target = target[:, 0]
+        points = points.transpose(2, 1)
+        points, target = points.cuda(), target.cuda()
+        classifier = model.eval()
+        with torch.no_grad():
+            pred = classifier(points[:, :3, :], None)
+        diff = pred - target
+        distance = torch.norm(diff, dim=1)
+        correct = torch.sum(distance < 0.2)
+        total_correct += correct.item()
+        total_seen += float(points.size()[0])
+
+    accuracy = total_correct / total_seen
+    return accuracy
+
 def compute_cat_iou(pred,target,iou_tabel):
     iou_list = []
     target = target.cpu().data.numpy()
