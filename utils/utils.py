@@ -65,7 +65,7 @@ def trans_test(model, loader):
     total_correct = 0.0
     total_seen = 0.0
     for j, data in enumerate(loader, 0):
-        points, target = data[:1024], data[1024]
+        points, target = data[:, :1024, :], data[:, 1024, :]
         points = points.transpose(2, 1)
         points, target = points.cuda(), target.cuda()
         classifier = model.eval()
