@@ -168,6 +168,7 @@ def main(args):
             optimizer.step()
             global_step += 1
 
+        print(mean_correct)
         train_acc = np.mean(mean_correct)
         print('Train Accuracy: %f' % train_acc)
         logger.info('Train Accuracy: %f' % train_acc)
