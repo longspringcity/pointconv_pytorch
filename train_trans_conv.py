@@ -22,7 +22,7 @@ def parse_args():
     parser = argparse.ArgumentParser('PointConv')
     # parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
     parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
-    parser.add_argument('--epoch', default=400, type=int, help='number of epoch in training')
+    parser.add_argument('--epoch', default=50, type=int, help='number of epoch in training')
     parser.add_argument('--learning_rate', default=0.001, type=float, help='learning rate in training')
     parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
     parser.add_argument('--num_point', type=int, default=1024, help='Point Number [default: 1024]')
@@ -77,10 +77,6 @@ def main(args):
                                           normal_channel=args.normal)
     TEST_DATASET = TranslationDataLoader(root=DATA_PATH, npoint=args.num_point, split='test',
                                          normal_channel=args.normal)
-    trainDataLoader = torch.utils.data.DataLoader(TRAIN_DATASET, batch_size=args.batchsize, shuffle=True,
-                                                  num_workers=args.num_workers)
-    testDataLoader = torch.utils.data.DataLoader(TEST_DATASET, batch_size=args.batchsize, shuffle=False,
-                                                 num_workers=args.num_workers)
 
     logger.info("The number of training data is: %d", len(TRAIN_DATASET))
     logger.info("The number of test data is: %d", len(TEST_DATASET))
@@ -117,11 +113,21 @@ def main(args):
     global_epoch = 0
     global_step = 0
     best_tst_accuracy = 0.0
+    train_steps = 1000
+    test_steps = 1000
     blue = lambda x: '\033[94m' + x + '\033[0m'
 
     '''TRANING'''
     logger.info('Start training...')
     for epoch in range(start_epoch, args.epoch):
+        train_idxs = np.random.choice(TRAIN_DATASET.__len__(), train_steps)
+        test_idxs = np.random.choice(TEST_DATASET.__len__(), test_steps)
+        train_sampler = torch.utils.data.sampler.Sampler(train_idxs)
+        test_sampler = torch.utils.data.sampler.Sampler(test_idxs)
+        trainDataLoader = torch.utils.data.DataLoader(TRAIN_DATASET, batch_size=args.batchsize, shuffle=True,
+                                                      sampler=train_sampler, num_workers=args.num_workers)
+        testDataLoader = torch.utils.data.DataLoader(TEST_DATASET, batch_size=args.batchsize, shuffle=False,
+                                                     sampler=test_sampler, num_workers=args.num_workers)
         print('Epoch %d (%d/%s):' % (global_epoch + 1, epoch + 1, args.epoch))
         logger.info('Epoch %d (%d/%s):', global_epoch + 1, epoch + 1, args.epoch)
         mean_correct = []
