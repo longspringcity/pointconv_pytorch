@@ -13,8 +13,9 @@ from tqdm import tqdm
 
 import provider
 from data_utils.TranslationDataLoader import TranslationDataLoader
-from model.pointconv import PointConvDensityClsSsg as PointConvClsSsg
+from model.pointconv_trans import PointConvDensityTrans as PointConvTrans
 from utils.utils import test, save_checkpoint
+import open3d as o3d
 
 
 def parse_args():
@@ -88,23 +89,23 @@ def main(args):
         torch.cuda.manual_seed_all(seed)
 
     '''MODEL LOADING'''
-    num_class = 40
-    classifier = PointConvClsSsg(num_class).cuda()
+    embs_len = 3
+    estimator = PointConvTrans(embs_len).cuda()
     if args.pretrain is not None:
         print('Use pretrain model...')
         logger.info('Use pretrain model')
         checkpoint = torch.load(args.pretrain)
         start_epoch = checkpoint['epoch']
-        classifier.load_state_dict(checkpoint['model_state_dict'])
+        estimator.load_state_dict(checkpoint['model_state_dict'])
     else:
         print('No existing model, starting training from scratch...')
         start_epoch = 0
 
     if args.optimizer == 'SGD':
-        optimizer = torch.optim.SGD(classifier.parameters(), lr=0.01, momentum=0.9)
+        optimizer = torch.optim.SGD(estimator.parameters(), lr=0.01, momentum=0.9)
     elif args.optimizer == 'Adam':
         optimizer = torch.optim.Adam(
-            classifier.parameters(),
+            estimator.parameters(),
             lr=args.learning_rate,
             betas=(0.9, 0.999),
             eps=1e-08,
@@ -126,23 +127,32 @@ def main(args):
         scheduler.step()
         # for batch_id, data in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
         for batch_id, data in enumerate(trainDataLoader, 0):
-            points = data
-            points = points.data.numpy()
+            points_set = data
+            points_set = points_set.data.numpy()
             # 增强数据: 随机放大和平移点云，随机移除一些点
-            jittered_data = provider.random_scale_point_cloud(points[:, :, 0:3], scale_low=2.0 / 3, scale_high=3 / 2.0)
+            jittered_data = provider.random_scale_point_cloud(points_set[:, :, 0:3], scale_low=2.0 / 3, scale_high=3 / 2.0)
             jittered_data = provider.shift_point_cloud(jittered_data, shift_range=0.2)
-            points[:, :, 0:3] = jittered_data
-            points = provider.random_point_dropout_v2(points)
-            provider.shuffle_points(points)
-            points = torch.Tensor(points)
-            target = target[:, 0]
+            points_set[:, :, 0:3] = jittered_data
+            points_set[:, :1024, :] = provider.random_point_dropout_v2(points_set[:, :1024, :])
+            points = torch.Tensor(points_set[:, :1024, :])
+            target = torch.Tensor(points_set[:, 1024:, :])
+
+            # vis_point = points[0, :, :].data.numpy()
+            # vis_target = target[0, :, :]
+            # vis_point_cloud = o3d.PointCloud()
+            # vis_point_cloud.points = o3d.Vector3dVector(vis_point)
+            # vis_point_cloud.paint_uniform_color([1, 0, 0])
+            # vis_target_cloud = o3d.PointCloud()
+            # vis_target_cloud.points = o3d.Vector3dVector(vis_target)
+            # vis_target_cloud.paint_uniform_color([0, 0, 0])
+            # o3d.draw_geometries([vis_point_cloud, vis_target_cloud])
 
             points, target = points.cuda(), target.cuda()
             optimizer.zero_grad()
 
-            classifier = classifier.train()
+            estimator = estimator.train()
             # pred = classifier(points[:, :3, :], points[:, 3:, :])
-            pred = classifier(points[:, :3, :], None)
+            pred = estimator(points[:, :3, :], None)
             loss = F.nll_loss(pred, target.long())
             pred_choice = pred.data.max(1)[1]
             correct = pred_choice.eq(target.long().data).cpu().sum()
@@ -155,7 +165,7 @@ def main(args):
         print('Train Accuracy: %f' % train_acc)
         logger.info('Train Accuracy: %f' % train_acc)
 
-        acc = test(classifier, testDataLoader)
+        acc = test(estimator, testDataLoader)
 
         if (acc >= best_tst_accuracy) and epoch > 5:
             best_tst_accuracy = acc
@@ -164,7 +174,7 @@ def main(args):
                 global_epoch + 1,
                 train_acc,
                 acc,
-                classifier,
+                estimator,
                 optimizer,
                 str(checkpoints_dir),
                 args.model_name)

@@ -9,9 +9,9 @@ import torch.nn.functional as F
 from utils.pointconv_util import PointConvDensitySetAbstraction
 
 
-class PointConvDensityClsSsg(nn.Module):
+class PointConvDensityTrans(nn.Module):
     def __init__(self, emb=3):
-        super(PointConvDensityClsSsg, self).__init__()
+        super(PointConvDensityTrans, self).__init__()
         feature_dim = 0
         self.sa1 = PointConvDensitySetAbstraction(npoint=512, nsample=32, in_channel=feature_dim + 3, mlp=[64, 64, 128],
                                                   bandwidth=0.1, group_all=False)
