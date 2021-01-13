@@ -49,8 +49,8 @@ class TranslationDataLoader(Dataset):
         self.normal_channel = normal_channel
 
         shape_ids = {}
-        shape_ids['train'] = [line.rstrip() for line in open(os.path.join(self.root, 'pointdata_train/train.txt'))]
-        shape_ids['test'] = [line.rstrip() for line in open(os.path.join(self.root, 'pointdata_test/test.txt'))]
+        shape_ids['train'] = [line.rstrip() for line in open(os.path.join(self.root, 'train/pointdata_train.txt'))]
+        shape_ids['test'] = [line.rstrip() for line in open(os.path.join(self.root, 'test/pointdata_test.txt'))]
 
         assert (split == 'train' or split == 'test')
         # list of (shape_name, shape_txt_file_path) tuple
