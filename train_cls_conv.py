@@ -20,23 +20,23 @@ from utils.utils import test, save_checkpoint
 def parse_args():
     '''PARAMETERS'''
     parser = argparse.ArgumentParser('PointConv')
-    # parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
-    parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
+    parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
+    # parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
     parser.add_argument('--epoch', default=400, type=int, help='number of epoch in training')
     parser.add_argument('--learning_rate', default=0.001, type=float, help='learning rate in training')
     parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
     parser.add_argument('--num_point', type=int, default=1024, help='Point Number [default: 1024]')
-    # parser.add_argument('--num_workers', type=int, default=16, help='Worker Number [default: 16]')
-    parser.add_argument('--num_workers', type=int, default=0, help='Worker Number [default: 16]')
+    parser.add_argument('--num_workers', type=int, default=16, help='Worker Number [default: 16]')
+    # parser.add_argument('--num_workers', type=int, default=0, help='Worker Number [default: 16]')
     parser.add_argument('--optimizer', type=str, default='SGD', help='optimizer for training')
     parser.add_argument('--pretrain', type=str, default=None, help='whether use pretrain model')
     parser.add_argument('--decay_rate', type=float, default=1e-4, help='decay rate of learning rate')
-    # parser.add_argument('--model_name', default='pointconv', help='model name')
-    parser.add_argument('--model_name', default='pointconv_modelnet40', help='model name')
-    # parser.add_argument('--normal', action='store_true', default=False,
-    #                     help='Whether to use normal information [default: False]')
-    parser.add_argument('--normal', default=True, help='Whether to use normal information')
-    return parser.parse_args()
+    parser.add_argument('--model_name', default='pointconv', help='model name')
+    # parser.add_argument('--model_name', default='pointconv_modelnet40', help='model name')
+    parser.add_argument('--normal', action='store_true', default=False,
+                        help='Whether to use normal information [default: False]')
+    # parser.add_argument('--normal', default=True, help='Whether to use normal information')
+    # return parser.parse_args()
 
 
 def main(args):
@@ -124,8 +124,8 @@ def main(args):
         mean_correct = []
 
         scheduler.step()
-        # for batch_id, data in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
-        for batch_id, data in enumerate(trainDataLoader, 0):
+        for batch_id, data in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
+        # for batch_id, data in enumerate(trainDataLoader, 0):
             points, target = data
             points = points.data.numpy()
             # 增强数据: 随机放大和平移点云，随机移除一些点
@@ -142,7 +142,8 @@ def main(args):
             optimizer.zero_grad()
 
             classifier = classifier.train()
-            pred = classifier(points[:, :3, :], points[:, 3:, :])
+            # pred = classifier(points[:, :3, :], points[:, 3:, :])
+            pred = classifier(points[:, :3, :], None)
             loss = F.nll_loss(pred, target.long())
             pred_choice = pred.data.max(1)[1]
             correct = pred_choice.eq(target.long().data).cpu().sum()
