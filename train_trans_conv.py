@@ -17,9 +17,6 @@ from model.pointconv_trans import PointConvDensityTrans as PointConvTrans
 from utils.utils import trans_test, save_checkpoint
 
 
-# import open3d as o3d
-
-
 def parse_args():
     '''PARAMETERS'''
     parser = argparse.ArgumentParser('PointConv')
@@ -32,7 +29,8 @@ def parse_args():
     # parser.add_argument('--num_workers', type=int, default=16, help='Worker Number [default: 16]')
     parser.add_argument('--num_workers', type=int, default=0, help='Worker Number [default: 16]')
     parser.add_argument('--optimizer', type=str, default='Adam', help='optimizer for training')
-    parser.add_argument('--pretrain', type=str, default='./pretrained/pointconv_modelnet40-0.800000-0149.pth', help='whether use pretrain model')
+    parser.add_argument('--pretrain', type=str, default='./pretrained/pointconv_modelnet40-0.800000-0149.pth',
+                        help='whether use pretrain model')
     parser.add_argument('--decay_rate', type=float, default=1e-4, help='decay rate of learning rate')
     # parser.add_argument('--model_name', default='pointconv', help='model name')
     parser.add_argument('--model_name', default='pointconv_modelnet40', help='model name')
@@ -141,21 +139,9 @@ def main(args):
             points_set[:, :1024, :] = provider.random_point_dropout_v2(points_set[:, :1024, :])
             points = torch.Tensor(points_set[:, :1024, :])
             target = torch.Tensor(points_set[:, 1024, :])
-
-            # vis_point = points[0, :, :].data.numpy()
-            # vis_target = target
-            # vis_point_cloud = o3d.PointCloud()
-            # vis_point_cloud.points = o3d.Vector3dVector(vis_point)
-            # vis_point_cloud.paint_uniform_color([1, 0, 0])
-            # vis_target_cloud = o3d.PointCloud()
-            # vis_target_cloud.points = o3d.Vector3dVector(vis_target)
-            # vis_target_cloud.paint_uniform_color([0, 0, 0])
-            # o3d.draw_geometries([vis_point_cloud, vis_target_cloud])
-
             points = points.transpose(2, 1)
             points, target = points.cuda(), target.cuda()
             optimizer.zero_grad()
-
             estimator = estimator.train()
             # pred = classifier(points[:, :3, :], points[:, 3:, :])
             pred = estimator(points[:, :3, :], None)
