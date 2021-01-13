@@ -124,9 +124,9 @@ def main(args):
         mean_correct = []
 
         scheduler.step()
-        for batch_id, data in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
-        # for batch_id, data in enumerate(trainDataLoader, 0):
-            points, target = data
+        # for batch_id, data in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
+        for batch_id, data in enumerate(trainDataLoader, 0):
+            points = data
             points = points.data.numpy()
             # 增强数据: 随机放大和平移点云，随机移除一些点
             jittered_data = provider.random_scale_point_cloud(points[:, :, 0:3], scale_low=2.0 / 3, scale_high=3 / 2.0)
@@ -137,7 +137,6 @@ def main(args):
             points = torch.Tensor(points)
             target = target[:, 0]
 
-            points = points.transpose(2, 1)
             points, target = points.cuda(), target.cuda()
             optimizer.zero_grad()
 
