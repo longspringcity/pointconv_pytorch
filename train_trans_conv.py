@@ -127,6 +127,8 @@ def main(args):
         print('Epoch %d (%d/%s):' % (global_epoch + 1, epoch + 1, args.epoch))
         logger.info('Epoch %d (%d/%s):', global_epoch + 1, epoch + 1, args.epoch)
         mean_correct = []
+        total_correct = 0.0
+        total_seen = 0.0
 
         scheduler.step()
         for batch_id, data in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
@@ -164,12 +166,14 @@ def main(args):
             distance = torch.norm(diff, dim=1)
             correct = torch.sum(distance < 0.2)
             mean_correct.append(correct.item() / float(points.size()[0]))
+            total_correct += correct.item()
+            total_seen += float(points.size()[0])
             loss.backward()
             optimizer.step()
             global_step += 1
 
-        print(mean_correct)
         train_acc = np.mean(mean_correct)
+        print(total_correct / total_seen)
         print('Train Accuracy: %f' % train_acc)
         logger.info('Train Accuracy: %f' % train_acc)
 
