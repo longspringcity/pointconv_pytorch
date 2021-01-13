@@ -52,7 +52,7 @@ def test(model, loader):
         points, target = points.cuda(), target.cuda()
         classifier = model.eval()
         with torch.no_grad():
-            pred = classifier(points[:, :3, :], points[:, 3:, :])
+            pred = classifier(points[:, :3, :], None)
         pred_choice = pred.data.max(1)[1]
         correct = pred_choice.eq(target.long().data).cpu().sum()
         total_correct += correct.item()
