@@ -3,7 +3,6 @@ import warnings
 
 import numpy as np
 from torch.utils.data import Dataset
-import open3d as o3d
 
 warnings.filterwarnings('ignore')
 
