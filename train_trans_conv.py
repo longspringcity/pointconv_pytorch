@@ -15,7 +15,9 @@ import provider
 from data_utils.TranslationDataLoader import TranslationDataLoader
 from model.pointconv_trans import PointConvDensityTrans as PointConvTrans
 from utils.utils import trans_test, save_checkpoint
-import open3d as o3d
+
+
+# import open3d as o3d
 
 
 def parse_args():
@@ -73,8 +75,10 @@ def main(args):
     logger.info('Load dataset ...')
     DATA_PATH = './data/point_data/'
 
-    TRAIN_DATASET = TranslationDataLoader(root=DATA_PATH, npoint=args.num_point, split='train', normal_channel=args.normal)
-    TEST_DATASET = TranslationDataLoader(root=DATA_PATH, npoint=args.num_point, split='test', normal_channel=args.normal)
+    TRAIN_DATASET = TranslationDataLoader(root=DATA_PATH, npoint=args.num_point, split='train',
+                                          normal_channel=args.normal)
+    TEST_DATASET = TranslationDataLoader(root=DATA_PATH, npoint=args.num_point, split='test',
+                                         normal_channel=args.normal)
     trainDataLoader = torch.utils.data.DataLoader(TRAIN_DATASET, batch_size=args.batchsize, shuffle=True,
                                                   num_workers=args.num_workers)
     testDataLoader = torch.utils.data.DataLoader(TEST_DATASET, batch_size=args.batchsize, shuffle=False,
@@ -125,12 +129,13 @@ def main(args):
         mean_correct = []
 
         scheduler.step()
-        # for batch_id, data in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
-        for batch_id, data in enumerate(trainDataLoader, 0):
+        for batch_id, data in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
+            # for batch_id, data in enumerate(trainDataLoader, 0):
             points_set = data
             points_set = points_set.data.numpy()
             # 增强数据: 随机放大和平移点云，随机移除一些点
-            jittered_data = provider.random_scale_point_cloud(points_set[:, :, 0:3], scale_low=2.0 / 3, scale_high=3 / 2.0)
+            jittered_data = provider.random_scale_point_cloud(points_set[:, :, 0:3], scale_low=2.0 / 3,
+                                                              scale_high=3 / 2.0)
             jittered_data = provider.shift_point_cloud(jittered_data, shift_range=0.2)
             points_set[:, :, 0:3] = jittered_data
             points_set[:, :1024, :] = provider.random_point_dropout_v2(points_set[:, :1024, :])
