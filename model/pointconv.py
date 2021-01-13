@@ -12,7 +12,7 @@ from utils.pointconv_util import PointConvDensitySetAbstraction
 class PointConvDensityClsSsg(nn.Module):
     def __init__(self, num_classes=40):
         super(PointConvDensityClsSsg, self).__init__()
-        feature_dim = 3
+        feature_dim = 0
         self.sa1 = PointConvDensitySetAbstraction(npoint=512, nsample=32, in_channel=feature_dim + 3, mlp=[64, 64, 128],
                                                   bandwidth=0.1, group_all=False)
         self.sa2 = PointConvDensitySetAbstraction(npoint=128, nsample=64, in_channel=128 + 3, mlp=[128, 128, 256],
