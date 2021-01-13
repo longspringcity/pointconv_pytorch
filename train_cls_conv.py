@@ -128,6 +128,7 @@ def main(args):
         for batch_id, data in enumerate(trainDataLoader, 0):
             points, target = data
             points = points.data.numpy()
+            # 增强数据: 随机放大和平移点云，随机移除一些点
             jittered_data = provider.random_scale_point_cloud(points[:, :, 0:3], scale_low=2.0 / 3, scale_high=3 / 2.0)
             jittered_data = provider.shift_point_cloud(jittered_data, shift_range=0.2)
             points[:, :, 0:3] = jittered_data

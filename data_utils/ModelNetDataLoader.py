@@ -93,10 +93,6 @@ class ModelNetDataLoader(Dataset):
 
         if not self.normal_channel:
             point_set = point_set[:, 0:3]
-        point_cloud = o3d.PointCloud()
-        point_cloud.points = o3d.Vector3dVector(point_set)
-        point_cloud.paint_uniform_color([1, 0, 0])
-        o3d.draw_geometries([point_cloud])
 
         return point_set, cls
 
