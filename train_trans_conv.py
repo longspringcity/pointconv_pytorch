@@ -20,15 +20,15 @@ from utils.utils import trans_test, save_checkpoint
 def parse_args():
     '''PARAMETERS'''
     parser = argparse.ArgumentParser('PointConv')
-    # parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
-    parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
+    parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
+    # parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
     parser.add_argument('--epoch', default=50, type=int, help='number of epoch in training')
     parser.add_argument('--learning_rate', default=0.001, type=float, help='learning rate in training')
     parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
     parser.add_argument('--num_point', type=int, default=1024, help='Point Number [default: 1024]')
-    # parser.add_argument('--num_workers', type=int, default=16, help='Worker Number [default: 16]')
-    parser.add_argument('--num_workers', type=int, default=0, help='Worker Number [default: 16]')
-    parser.add_argument('--optimizer', type=str, default='Adam', help='optimizer for training')
+    parser.add_argument('--num_workers', type=int, default=16, help='Worker Number [default: 16]')
+    # parser.add_argument('--num_workers', type=int, default=0, help='Worker Number [default: 16]')
+    parser.add_argument('--optimizer', type=str, default='SGD', help='optimizer for training')
     parser.add_argument('--pretrain', type=str, default=None,
                         help='whether use pretrain model')
     parser.add_argument('--decay_rate', type=float, default=1e-4, help='decay rate of learning rate')
@@ -113,8 +113,8 @@ def main(args):
     global_epoch = 0
     global_step = 0
     best_tst_accuracy = 0.0
-    train_steps = 1000
-    test_steps = 1000
+    train_steps = 1600
+    test_steps = 1600
     blue = lambda x: '\033[94m' + x + '\033[0m'
 
     '''TRANING'''
