@@ -122,12 +122,12 @@ def main(args):
     for epoch in range(start_epoch, args.epoch):
         train_idxs = np.random.choice(TRAIN_DATASET.__len__(), train_steps)
         test_idxs = np.random.choice(TEST_DATASET.__len__(), test_steps)
-        train_sampler = torch.utils.data.sampler.Sampler(train_idxs)
+        train_sampler = torch.utils.data.sampler.RandomSampler(train_idxs)
         test_sampler = torch.utils.data.sampler.Sampler(test_idxs)
-        trainDataLoader = torch.utils.data.DataLoader(TRAIN_DATASET, batch_size=args.batchsize, shuffle=True,
-                                                      sampler=train_sampler, num_workers=args.num_workers)
-        testDataLoader = torch.utils.data.DataLoader(TEST_DATASET, batch_size=args.batchsize, shuffle=False,
-                                                     sampler=test_sampler, num_workers=args.num_workers)
+        trainDataLoader = torch.utils.data.DataLoader(TRAIN_DATASET, batch_size=args.batchsize, sampler=train_sampler,
+                                                      num_workers=args.num_workers)
+        testDataLoader = torch.utils.data.DataLoader(TEST_DATASET, batch_size=args.batchsize, sampler=test_sampler,
+                                                     num_workers=args.num_workers)
         print('Epoch %d (%d/%s):' % (global_epoch + 1, epoch + 1, args.epoch))
         logger.info('Epoch %d (%d/%s):', global_epoch + 1, epoch + 1, args.epoch)
         mean_correct = []
