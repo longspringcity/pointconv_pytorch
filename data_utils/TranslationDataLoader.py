@@ -49,12 +49,12 @@ class TranslationDataLoader(Dataset):
         self.normal_channel = normal_channel
 
         shape_ids = {}
-        shape_ids['train'] = [line.rstrip() for line in open(os.path.join(self.root, 'train/pointdata_train.txt'))]
-        shape_ids['test'] = [line.rstrip() for line in open(os.path.join(self.root, 'test/pointdata_test.txt'))]
+        shape_ids['train'] = [line.rstrip() for line in open(os.path.join(self.root, self.split, 'pointdata_train.txt'))]
+        shape_ids['test'] = [line.rstrip() for line in open(os.path.join(self.root, self.split, 'pointdata_test.txt'))]
 
         assert (split == 'train' or split == 'test')
         # list of (shape_name, shape_txt_file_path) tuple
-        self.datapath = [(os.path.join(self.root, shape_ids[split][i])) for i in range(len(shape_ids[split]))]
+        self.datapath = [(os.path.join(self.root, self.split, shape_ids[split][i])) for i in range(len(shape_ids[split]))]
         print('The size of %s data is %d' % (split, len(self.datapath)))
 
         self.cache_size = cache_size  # how many data points to cache in memory
