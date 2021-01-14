@@ -74,7 +74,7 @@ def trans_test(model, loader):
             pred = classifier(points[:, :3, :], None)
         diff = pred - target
         distance = torch.norm(diff, dim=1)
-        correct = torch.sum(distance < 0.2)
+        correct = torch.sum(distance < 0.05)
         total_correct += correct.item()
         total_seen += float(points.size()[0])
         # vis_point = points[0, :, :].data.cpu().numpy().T

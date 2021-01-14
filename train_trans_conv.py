@@ -154,7 +154,7 @@ def main(args):
             loss = F.mse_loss(pred, target)
             diff = pred - target
             distance = torch.norm(diff, dim=1)
-            correct = torch.sum(distance < 0.2)
+            correct = torch.sum(distance < 0.05)
             mean_correct.append(correct.item() / float(points.size()[0]))
             loss.backward()
             optimizer.step()
