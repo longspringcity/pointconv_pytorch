@@ -113,7 +113,7 @@ def main(args):
     global_epoch = 0
     global_step = 0
     best_tst_accuracy = 0.0
-    train_steps = 1600
+    train_steps = 4800
     test_steps = 1600
     blue = lambda x: '\033[94m' + x + '\033[0m'
 
@@ -123,7 +123,7 @@ def main(args):
         train_idxs = np.random.choice(TRAIN_DATASET.__len__(), train_steps)
         test_idxs = np.random.choice(TEST_DATASET.__len__(), test_steps)
         train_sampler = torch.utils.data.sampler.RandomSampler(train_idxs)
-        test_sampler = torch.utils.data.sampler.Sampler(test_idxs)
+        test_sampler = torch.utils.data.sampler.SequentialSampler(test_idxs)
         trainDataLoader = torch.utils.data.DataLoader(TRAIN_DATASET, batch_size=args.batchsize, sampler=train_sampler,
                                                       num_workers=args.num_workers)
         testDataLoader = torch.utils.data.DataLoader(TEST_DATASET, batch_size=args.batchsize, sampler=test_sampler,
