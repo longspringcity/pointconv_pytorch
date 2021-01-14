@@ -22,7 +22,7 @@ def parse_args():
     parser = argparse.ArgumentParser('PointConv')
     parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
     # parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
-    parser.add_argument('--epoch', default=50, type=int, help='number of epoch in training')
+    parser.add_argument('--epoch', default=100, type=int, help='number of epoch in training')
     parser.add_argument('--learning_rate', default=0.001, type=float, help='learning rate in training')
     parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
     parser.add_argument('--num_point', type=int, default=1024, help='Point Number [default: 1024]')
