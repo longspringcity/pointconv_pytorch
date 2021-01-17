@@ -142,7 +142,7 @@ def main(args):
             #                                                   scale_high=3 / 2.0)
             # jittered_data = provider.shift_point_cloud(jittered_data, shift_range=0.2)
             # points_set[:, :, 0:3] = jittered_data
-            points_set[:, :1024, :] = provider.random_point_dropout_v2(points_set[:, :1024, :])
+            # points_set[:, :1024, :] = provider.random_point_dropout_v2(points_set[:, :1024, :])
             points = torch.Tensor(points_set[:, :1024, :])
             target = torch.Tensor(points_set[:, 1024, :])
             points = points.transpose(2, 1)
