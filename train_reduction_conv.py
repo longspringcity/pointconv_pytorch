@@ -75,11 +75,11 @@ def main(args):
 
     TRAIN_DATASET = ReductionDataLoader(root=DATA_PATH, npoint=args.num_point, split='train',
                                         normal_channel=args.normal)
-    TEST_DATASET = ReductionDataLoader(root=DATA_PATH, npoint=args.num_point, split='test',
-                                       normal_channel=args.normal)
+    # TEST_DATASET = ReductionDataLoader(root=DATA_PATH, npoint=args.num_point, split='test',
+    #                                    normal_channel=args.normal)
 
     logger.info("The number of training data is: %d", len(TRAIN_DATASET))
-    logger.info("The number of test data is: %d", len(TEST_DATASET))
+    # logger.info("The number of test data is: %d", len(TEST_DATASET))
 
     seed = 3
     torch.manual_seed(seed)
