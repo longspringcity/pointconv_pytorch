@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument('--num_workers', type=int, default=16, help='Worker Number [default: 16]')
     # parser.add_argument('--num_workers', type=int, default=0, help='Worker Number [default: 16]')
     parser.add_argument('--optimizer', type=str, default='SGD', help='optimizer for training')
-    parser.add_argument('--pretrain', type=str, default='pretrained/pointconv_modelnet40-0.892500-0059.pth',
+    parser.add_argument('--pretrain', type=str, default=None,
                         help='whether use pretrain model')
     parser.add_argument('--decay_rate', type=float, default=1e-4, help='decay rate of learning rate')
     # parser.add_argument('--model_name', default='pointconv', help='model name')
