@@ -67,12 +67,15 @@ def trans_test(model, loader):
     total_seen = 0.0
     for j, data in enumerate(loader, 0):
         points_set, n_cent, n_size = data
+        n_cent = n_cent.cuda()
+        n_size = n_size.cuda()
         points, target = points_set[:, :1024, :], points_set[:, 1024, :]
         points = points.transpose(2, 1)
         points, target = points.cuda(), target.cuda()
         classifier = model.eval()
         with torch.no_grad():
             pred = classifier(points[:, :3, :], None)
+        n_size = torch.unsqueeze(n_size, dim=1).repeat(1, 3)
         real_t = target * n_size + n_cent
         real_p = pred * n_size + n_cent
         diff = real_p - real_t
