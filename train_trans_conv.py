@@ -145,6 +145,7 @@ def main(args):
             jittered_data, j_shift = provider.shift_point_cloud(jittered_data, shift_range=0.2)
             points_set[:, :, 0:3] = jittered_data
             points_set[:, :1024, :] = provider.random_point_dropout_v2(points_set[:, :1024, :])
+            # 推理
             points = torch.Tensor(points_set[:, :1024, :])
             target = torch.Tensor(points_set[:, 1024, :])
             points = points.transpose(2, 1)
@@ -152,12 +153,14 @@ def main(args):
             optimizer.zero_grad()
             estimator = estimator.train()
             pred = estimator(points[:, :3, :], None)
-            loss = F.mse_loss(pred, target)
+
+            # 数据还原
             j_scale = torch.Tensor(np.tile(j_scale[:, np.newaxis], (1, 3))).cuda()
             j_shift = torch.Tensor(j_shift).cuda()
             n_size = torch.unsqueeze(n_size, dim=1).repeat(1, 3)
             real_t = (((target - j_shift) / j_scale) * n_size) + n_cent
             real_p = (((pred - j_shift) / j_scale) * n_size) + n_cent
+            loss = F.mse_loss(real_p, real_t)
 
             # import open3d as o3d
             # vis_point = points[0, :, :].data.cpu().numpy().T
@@ -185,8 +188,8 @@ def main(args):
             distance = torch.norm(diff, dim=1)
             correct = torch.sum(distance < 0.05)
             mean_correct.append(correct.item() / float(points.size()[0]))
-            # loss.backward()
-            # optimizer.step()
+            loss.backward()
+            optimizer.step()
             global_step += 1
 
         train_acc = np.mean(mean_correct)
