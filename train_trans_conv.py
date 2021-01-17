@@ -151,7 +151,7 @@ def main(args):
             estimator = estimator.train()
             pred = estimator(points[:, :3, :], None)
             loss = F.mse_loss(pred, target)
-            j_scale = torch.Tensor(np.tile(j_scale, (1, 3))).cuda()
+            j_scale = torch.Tensor(np.tile(j_scale, 3)).cuda()
             j_shift = torch.Tensor(j_shift).cuda()
             print(target.shape)
             print(j_scale.shape)
