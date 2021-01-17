@@ -21,7 +21,7 @@ def parse_args():
     '''PARAMETERS'''
     parser = argparse.ArgumentParser('PointConv')
     # parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
-    parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
+    parser.add_argument('--batchsize', type=int, default=5, help='batch size in training')
     parser.add_argument('--epoch', default=100, type=int, help='number of epoch in training')
     parser.add_argument('--learning_rate', default=0.001, type=float, help='learning rate in training')
     parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
@@ -152,13 +152,12 @@ def main(args):
             # pred = classifier(points[:, :3, :], points[:, 3:, :])
             pred = estimator(points[:, :3, :], None)
             loss = F.mse_loss(pred, target)
-            print(loss)
 
             # import open3d as o3d
-            vis_point = points[0, :, :].data.cpu().numpy().T
-            vis_target = target[:1, :].data.cpu().numpy()
-            vis_pred = pred[:1, :].data.cpu().numpy()
-            print(vis_target, vis_pred)
+            # vis_point = points[0, :, :].data.cpu().numpy().T
+            # vis_target = target[:1, :].data.cpu().numpy()
+            # vis_pred = pred[:1, :].data.cpu().numpy()
+            # print(vis_target, vis_pred)
             # vis_point_cloud = o3d.PointCloud()
             # vis_point_cloud.points = o3d.Vector3dVector(vis_point)
             # vis_point_cloud.paint_uniform_color([1, 0, 0])
@@ -168,9 +167,9 @@ def main(args):
             # vis_pred_cloud = o3d.PointCloud()
             # vis_pred_cloud.points = o3d.Vector3dVector(vis_pred)
             # vis_pred_cloud.paint_uniform_color([0, 0, 1])
-            vis_diff = vis_target - vis_pred
-            vis_dist = np.linalg.norm(vis_diff)
-            print(vis_dist)
+            # vis_diff = vis_target - vis_pred
+            # vis_dist = np.linalg.norm(vis_diff)
+            # print(vis_dist)
             # o3d.draw_geometries([vis_point_cloud, vis_target_cloud, vis_pred_cloud])
 
             diff = pred - target
