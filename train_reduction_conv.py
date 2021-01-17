@@ -101,7 +101,7 @@ def main(args):
         start_epoch = 0
 
     if args.optimizer == 'SGD':
-        optimizer = torch.optim.SGD(reductioner.parameters(), lr=0.01, momentum=0.9)
+        optimizer = torch.optim.SGD(reductioner.parameters(), lr=0.001, momentum=0.9)
     elif args.optimizer == 'Adam':
         optimizer = torch.optim.Adam(
             reductioner.parameters(),
@@ -110,7 +110,7 @@ def main(args):
             eps=1e-08,
             weight_decay=args.decay_rate
         )
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.7)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=20, gamma=0.2)
     global_epoch = 0
     global_step = 0
     best_tst_accuracy = 0.0
