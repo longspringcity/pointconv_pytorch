@@ -29,7 +29,7 @@ def parse_args():
     parser.add_argument('--num_workers', type=int, default=16, help='Worker Number [default: 16]')
     # parser.add_argument('--num_workers', type=int, default=0, help='Worker Number [default: 16]')
     parser.add_argument('--optimizer', type=str, default='SGD', help='optimizer for training')
-    parser.add_argument('--pretrain', type=str, default=None,
+    parser.add_argument('--pretrain', type=str, default='pretrained/pointconv_modelnet40-0.892500-0059.pth',
                         help='whether use pretrain model')
     parser.add_argument('--decay_rate', type=float, default=1e-4, help='decay rate of learning rate')
     # parser.add_argument('--model_name', default='pointconv', help='model name')
@@ -109,7 +109,7 @@ def main(args):
             eps=1e-08,
             weight_decay=args.decay_rate
         )
-    scheduler = torch.optim.lr_scheduler.StepLR(optim   QAizer, step_size=30, gamma=0.7)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.7)
     global_epoch = 0
     global_step = 0
     best_tst_accuracy = 0.0
