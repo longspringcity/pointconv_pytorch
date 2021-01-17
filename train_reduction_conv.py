@@ -101,7 +101,7 @@ def main(args):
         start_epoch = 0
 
     if args.optimizer == 'SGD':
-        optimizer = torch.optim.SGD(reductioner.parameters(), lr=0.001, momentum=0.9)
+        optimizer = torch.optim.SGD(reductioner.parameters(), lr=0.01, momentum=0.9)
     elif args.optimizer == 'Adam':
         optimizer = torch.optim.Adam(
             reductioner.parameters(),
@@ -145,10 +145,10 @@ def main(args):
             points_set[:, :, 0:3] = jittered_data
             points_set[:, :1024, :] = provider.random_point_dropout_v2(points_set[:, :1024, :])
             # 推理
-            points = torch.Tensor(points_set[:, :1024, :])
+            # points = torch.Tensor(points_set[:, :1024, :])
             target = torch.Tensor(points_set[:, 1024:2048, :])
 
-            points = points.transpose(2, 1)
+            points = target.transpose(2, 1)  # 此处将target进行学习
             points, target = points.cuda(), target.cuda()
             optimizer.zero_grad()
             reductioner = reductioner.train()
