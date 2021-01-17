@@ -109,7 +109,7 @@ def main(args):
             eps=1e-08,
             weight_decay=args.decay_rate
         )
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.7)
+    scheduler = torch.optim.lr_scheduler.StepLR(optim   QAizer, step_size=30, gamma=0.7)
     global_epoch = 0
     global_step = 0
     best_tst_accuracy = 0.0
