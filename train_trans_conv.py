@@ -148,7 +148,7 @@ def main(args):
             points = points.transpose(2, 1)
             points, target = points.cuda(), target.cuda()
             optimizer.zero_grad()
-            estimator = estimator.train()
+            estimator = estimator.eval()
             # pred = classifier(points[:, :3, :], points[:, 3:, :])
             pred = estimator(points[:, :3, :], None)
             loss = F.mse_loss(pred, target)
@@ -187,7 +187,7 @@ def main(args):
         print('Train Accuracy: %f' % train_acc)
         logger.info('Train Accuracy: %f' % train_acc)
 
-        acc = trans_test(estimator, trainDataLoader)
+        acc = trans_test(estimator, testDataLoader)
 
         if (acc >= best_tst_accuracy) and epoch > 5:
             best_tst_accuracy = acc
