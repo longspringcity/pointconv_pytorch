@@ -153,6 +153,9 @@ def main(args):
             loss = F.mse_loss(pred, target)
             j_scale = torch.Tensor(j_scale).cuda()
             j_shift = torch.Tensor(j_shift).cuda()
+            print(target.shape)
+            print(j_scale.shape)
+            print(j_shift.shape)
             real_t = (((target - j_shift) / j_scale) * n_size) + n_cent
             real_p = (((pred - j_shift) / j_scale) * n_size) + n_cent
 
