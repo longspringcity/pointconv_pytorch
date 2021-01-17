@@ -21,7 +21,7 @@ def parse_args():
     '''PARAMETERS'''
     parser = argparse.ArgumentParser('PointConv')
     # parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
-    parser.add_argument('--batchsize', type=int, default=3, help='batch size in training')
+    parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
     parser.add_argument('--epoch', default=100, type=int, help='number of epoch in training')
     parser.add_argument('--learning_rate', default=0.001, type=float, help='learning rate in training')
     parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
@@ -138,10 +138,10 @@ def main(args):
             points_set = data
             points_set = points_set.data.numpy()
             # 增强数据: 随机缩放和平移点云，随机移除一些点
-            jittered_data = provider.random_scale_point_cloud(points_set[:, :, 0:3], scale_low=2.0 / 3,
-                                                              scale_high=3 / 2.0)
-            jittered_data = provider.shift_point_cloud(jittered_data, shift_range=0.2)
-            points_set[:, :, 0:3] = jittered_data
+            # jittered_data = provider.random_scale_point_cloud(points_set[:, :, 0:3], scale_low=2.0 / 3,
+            #                                                   scale_high=3 / 2.0)
+            # jittered_data = provider.shift_point_cloud(jittered_data, shift_range=0.2)
+            # points_set[:, :, 0:3] = jittered_data
             points_set[:, :1024, :] = provider.random_point_dropout_v2(points_set[:, :1024, :])
             points = torch.Tensor(points_set[:, :1024, :])
             target = torch.Tensor(points_set[:, 1024, :])
@@ -157,7 +157,7 @@ def main(args):
             # vis_point = points[0, :, :].data.cpu().numpy().T
             # vis_target = target[:1, :].data.cpu().numpy()
             # vis_pred = pred[:1, :].data.cpu().numpy()
-            # print(vis_target, vis_pred)
+            # vis_cent = np.array([[0., 0., 0.]])
             # vis_point_cloud = o3d.PointCloud()
             # vis_point_cloud.points = o3d.Vector3dVector(vis_point)
             # vis_point_cloud.paint_uniform_color([1, 0, 0])
@@ -167,10 +167,13 @@ def main(args):
             # vis_pred_cloud = o3d.PointCloud()
             # vis_pred_cloud.points = o3d.Vector3dVector(vis_pred)
             # vis_pred_cloud.paint_uniform_color([0, 0, 1])
+            # vis_cent_cloud = o3d.PointCloud()
+            # vis_cent_cloud.points = o3d.Vector3dVector(vis_cent)
+            # vis_cent_cloud.paint_uniform_color([0, 1, 0])
             # vis_diff = vis_target - vis_pred
             # vis_dist = np.linalg.norm(vis_diff)
             # print(vis_dist)
-            # o3d.draw_geometries([vis_point_cloud, vis_target_cloud, vis_pred_cloud])
+            # o3d.draw_geometries([vis_point_cloud, vis_target_cloud, vis_pred_cloud, vis_cent_cloud])
 
             diff = pred - target
             distance = torch.norm(diff, dim=1)
