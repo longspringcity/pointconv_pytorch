@@ -78,24 +78,24 @@ def trans_test(model, loader):
         total_correct += correct.item()
         total_seen += float(points.size()[0])
 
-        import open3d as o3d
+        # import open3d as o3d
         vis_point = points[0, :, :].data.cpu().numpy().T
         vis_target = target[:1, :].data.cpu().numpy()
         vis_pred = pred[:1, :].data.cpu().numpy()
         print(vis_target, vis_pred)
-        vis_point_cloud = o3d.PointCloud()
-        vis_point_cloud.points = o3d.Vector3dVector(vis_point)
-        vis_point_cloud.paint_uniform_color([1, 0, 0])
-        vis_target_cloud = o3d.PointCloud()
-        vis_target_cloud.points = o3d.Vector3dVector(vis_target)
-        vis_target_cloud.paint_uniform_color([0, 0, 0])
-        vis_pred_cloud = o3d.PointCloud()
-        vis_pred_cloud.points = o3d.Vector3dVector(vis_pred)
-        vis_pred_cloud.paint_uniform_color([0, 0, 1])
+        # vis_point_cloud = o3d.PointCloud()
+        # vis_point_cloud.points = o3d.Vector3dVector(vis_point)
+        # vis_point_cloud.paint_uniform_color([1, 0, 0])
+        # vis_target_cloud = o3d.PointCloud()
+        # vis_target_cloud.points = o3d.Vector3dVector(vis_target)
+        # vis_target_cloud.paint_uniform_color([0, 0, 0])
+        # vis_pred_cloud = o3d.PointCloud()
+        # vis_pred_cloud.points = o3d.Vector3dVector(vis_pred)
+        # vis_pred_cloud.paint_uniform_color([0, 0, 1])
         vis_diff = vis_target - vis_pred
         vis_dist = np.linalg.norm(vis_diff)
         print(vis_dist)
-        o3d.draw_geometries([vis_point_cloud, vis_target_cloud, vis_pred_cloud])
+        # o3d.draw_geometries([vis_point_cloud, vis_target_cloud, vis_pred_cloud])
 
     accuracy = total_correct / total_seen
     return accuracy
