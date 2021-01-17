@@ -20,14 +20,14 @@ from utils.utils import trans_test, save_checkpoint
 def parse_args():
     '''PARAMETERS'''
     parser = argparse.ArgumentParser('PointConv')
-    parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
-    # parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
+    # parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
+    parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
     parser.add_argument('--epoch', default=100, type=int, help='number of epoch in training')
     parser.add_argument('--learning_rate', default=0.001, type=float, help='learning rate in training')
     parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
     parser.add_argument('--num_point', type=int, default=1024, help='Point Number [default: 1024]')
-    parser.add_argument('--num_workers', type=int, default=16, help='Worker Number [default: 16]')
-    # parser.add_argument('--num_workers', type=int, default=0, help='Worker Number [default: 16]')
+    # parser.add_argument('--num_workers', type=int, default=16, help='Worker Number [default: 16]')
+    parser.add_argument('--num_workers', type=int, default=0, help='Worker Number [default: 16]')
     parser.add_argument('--optimizer', type=str, default='SGD', help='optimizer for training')
     parser.add_argument('--pretrain', type=str, default='pretrained/pointconv_modelnet40-0.892500-0059.pth',
                         help='whether use pretrain model')
@@ -113,8 +113,8 @@ def main(args):
     global_epoch = 0
     global_step = 0
     best_tst_accuracy = 0.0
-    train_steps = 4800
-    test_steps = 1600
+    train_steps = 4
+    test_steps = 2
     blue = lambda x: '\033[94m' + x + '\033[0m'
 
     '''TRANING'''
@@ -137,6 +137,8 @@ def main(args):
             # for batch_id, data in enumerate(trainDataLoader, 0):
             points_set, n_cent, n_size = data
             points_set = points_set.data.numpy()
+            n_cent = n_cent.cuda()
+            n_size = n_size.cuda()
             # 增强数据: 随机缩放和平移点云，随机移除一些点
             jittered_data, j_scale = provider.random_scale_point_cloud(points_set[:, :, 0:3], scale_low=2.0 / 3,
                                                                      scale_high=3 / 2.0)
@@ -153,10 +155,7 @@ def main(args):
             loss = F.mse_loss(pred, target)
             j_scale = torch.Tensor(np.tile(j_scale[:, np.newaxis], (1, 3))).cuda()
             j_shift = torch.Tensor(j_shift).cuda()
-            print(target.shape)
-            print(j_scale.shape)
-            print(n_size.shape)
-            print(n_cent.shape)
+            n_size = torch.unsqueeze(n_size, dim=1).repeat(1, 3)
             real_t = (((target - j_shift) / j_scale) * n_size) + n_cent
             real_p = (((pred - j_shift) / j_scale) * n_size) + n_cent
 
