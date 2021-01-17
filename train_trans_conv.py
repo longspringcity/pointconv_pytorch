@@ -153,6 +153,7 @@ def main(args):
             loss = F.mse_loss(pred, target)
             j_scale = torch.Tensor(j_scale).cuda()
             j_shift = torch.Tensor(j_shift).cuda()
+            j_scale = torch.unsqueeze(j_scale, 1)
             print(target.shape)
             print(j_scale.shape)
             print(j_shift.shape)
