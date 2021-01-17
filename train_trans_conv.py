@@ -187,7 +187,7 @@ def main(args):
         print('Train Accuracy: %f' % train_acc)
         logger.info('Train Accuracy: %f' % train_acc)
 
-        acc = trans_test(estimator, testDataLoader)
+        acc = trans_test(estimator, trainDataLoader)
 
         if (acc >= best_tst_accuracy) and epoch > 5:
             best_tst_accuracy = acc
