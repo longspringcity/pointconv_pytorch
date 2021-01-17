@@ -113,8 +113,8 @@ def main(args):
     global_epoch = 0
     global_step = 0
     best_tst_accuracy = 0.0
-    train_steps = 10
-    test_steps = 10
+    train_steps = 4800
+    test_steps = 1600
     blue = lambda x: '\033[94m' + x + '\033[0m'
 
     '''TRANING'''
@@ -151,8 +151,8 @@ def main(args):
             estimator = estimator.train()
             pred = estimator(points[:, :3, :], None)
             loss = F.mse_loss(pred, target)
-            j_scale = torch.Tensor(j_scale)
-            j_shift = torch.Tensor(j_shift)
+            j_scale = torch.Tensor(j_scale).cuda()
+            j_shift = torch.Tensor(j_shift).cuda()
             real_t = (((target - j_shift) / j_scale) * n_size) + n_cent
             real_p = (((pred - j_shift) / j_scale) * n_size) + n_cent
 
