@@ -20,14 +20,14 @@ from utils.utils import trans_test, save_checkpoint
 def parse_args():
     '''PARAMETERS'''
     parser = argparse.ArgumentParser('PointConv')
-    parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
-    # parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
+    # parser.add_argument('--batchsize', type=int, default=32, help='batch size in training')
+    parser.add_argument('--batchsize', type=int, default=2, help='batch size in training')
     parser.add_argument('--epoch', default=100, type=int, help='number of epoch in training')
     parser.add_argument('--learning_rate', default=0.001, type=float, help='learning rate in training')
     parser.add_argument('--gpu', type=str, default='0', help='specify gpu device')
     parser.add_argument('--num_point', type=int, default=1024, help='Point Number [default: 1024]')
-    parser.add_argument('--num_workers', type=int, default=16, help='Worker Number [default: 16]')
-    # parser.add_argument('--num_workers', type=int, default=0, help='Worker Number [default: 16]')
+    # parser.add_argument('--num_workers', type=int, default=16, help='Worker Number [default: 16]')
+    parser.add_argument('--num_workers', type=int, default=0, help='Worker Number [default: 16]')
     parser.add_argument('--optimizer', type=str, default='SGD', help='optimizer for training')
     parser.add_argument('--pretrain', type=str, default='pretrained/pointconv_modelnet40-0.892500-0059.pth',
                         help='whether use pretrain model')
@@ -113,8 +113,8 @@ def main(args):
     global_epoch = 0
     global_step = 0
     best_tst_accuracy = 0.0
-    train_steps = 160
-    test_steps = 160
+    train_steps = 30
+    test_steps = 10
     blue = lambda x: '\033[94m' + x + '\033[0m'
 
     '''TRANING'''
@@ -137,7 +137,7 @@ def main(args):
             # for batch_id, data in enumerate(trainDataLoader, 0):
             points_set = data
             points_set = points_set.data.numpy()
-            # 增强数据: 随机放大和平移点云，随机移除一些点
+            # 增强数据: 随机缩放和平移点云，随机移除一些点
             jittered_data = provider.random_scale_point_cloud(points_set[:, :, 0:3], scale_low=2.0 / 3,
                                                               scale_high=3 / 2.0)
             jittered_data = provider.shift_point_cloud(jittered_data, shift_range=0.2)
@@ -152,31 +152,33 @@ def main(args):
             # pred = classifier(points[:, :3, :], points[:, 3:, :])
             pred = estimator(points[:, :3, :], None)
             loss = F.mse_loss(pred, target)
+            print(loss)
 
-            # import open3d as o3d
-            # vis_point = points[0, :, :].data.cpu().numpy().T
-            # vis_target = target[:1, :].data.cpu().numpy()
-            # vis_point_cloud = o3d.PointCloud()
-            # vis_point_cloud.points = o3d.Vector3dVector(vis_point)
-            # vis_point_cloud.paint_uniform_color([1, 0, 0])
-            # vis_target_cloud = o3d.PointCloud()
-            # vis_target_cloud.points = o3d.Vector3dVector(vis_target)
-            # vis_target_cloud.paint_uniform_color([0, 0, 0])
-            # vis_pred = pred[:1, :].data.cpu().numpy()
-            # vis_pred_cloud = o3d.PointCloud()
-            # vis_pred_cloud.points = o3d.Vector3dVector(vis_pred)
-            # vis_pred_cloud.paint_uniform_color([0, 0, 1])
-            # vis_diff = vis_target - vis_pred
-            # vis_dist = np.linalg.norm(vis_diff)
-            # print(vis_dist)
-            # o3d.draw_geometries([vis_point_cloud, vis_target_cloud, vis_pred_cloud])
+            import open3d as o3d
+            vis_point = points[0, :, :].data.cpu().numpy().T
+            vis_target = target[:1, :].data.cpu().numpy()
+            vis_pred = pred[:1, :].data.cpu().numpy()
+            print(vis_target, vis_pred)
+            vis_point_cloud = o3d.PointCloud()
+            vis_point_cloud.points = o3d.Vector3dVector(vis_point)
+            vis_point_cloud.paint_uniform_color([1, 0, 0])
+            vis_target_cloud = o3d.PointCloud()
+            vis_target_cloud.points = o3d.Vector3dVector(vis_target)
+            vis_target_cloud.paint_uniform_color([0, 0, 0])
+            vis_pred_cloud = o3d.PointCloud()
+            vis_pred_cloud.points = o3d.Vector3dVector(vis_pred)
+            vis_pred_cloud.paint_uniform_color([0, 0, 1])
+            vis_diff = vis_target - vis_pred
+            vis_dist = np.linalg.norm(vis_diff)
+            print(vis_dist)
+            o3d.draw_geometries([vis_point_cloud, vis_target_cloud, vis_pred_cloud])
 
             diff = pred - target
             distance = torch.norm(diff, dim=1)
             correct = torch.sum(distance < 0.05)
             mean_correct.append(correct.item() / float(points.size()[0]))
-            loss.backward()
-            optimizer.step()
+            # loss.backward()
+            # optimizer.step()
             global_step += 1
 
         train_acc = np.mean(mean_correct)
