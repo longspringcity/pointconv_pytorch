@@ -66,13 +66,16 @@ def trans_test(model, loader):
     total_correct = 0.0
     total_seen = 0.0
     for j, data in enumerate(loader, 0):
-        points, target = data[:, :1024, :], data[:, 1024, :]
+        points_set, n_cent, n_size = data
+        points, target = points_set[:, :1024, :], points_set[:, 1024, :]
         points = points.transpose(2, 1)
         points, target = points.cuda(), target.cuda()
         classifier = model.eval()
         with torch.no_grad():
             pred = classifier(points[:, :3, :], None)
-        diff = pred - target
+        real_t = target * n_size + n_cent
+        real_p = pred * n_size + n_cent
+        diff = real_p - real_t
         distance = torch.norm(diff, dim=1)
         correct = torch.sum(distance < 0.05)
         total_correct += correct.item()

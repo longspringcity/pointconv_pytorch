@@ -135,23 +135,24 @@ def main(args):
         scheduler.step()
         for batch_id, data in tqdm(enumerate(trainDataLoader, 0), total=len(trainDataLoader), smoothing=0.9):
             # for batch_id, data in enumerate(trainDataLoader, 0):
-            points_set = data
+            points_set, n_cent, n_size = data
             points_set = points_set.data.numpy()
             # 增强数据: 随机缩放和平移点云，随机移除一些点
-            # jittered_data = provider.random_scale_point_cloud(points_set[:, :, 0:3], scale_low=2.0 / 3,
-            #                                                   scale_high=3 / 2.0)
-            # jittered_data = provider.shift_point_cloud(jittered_data, shift_range=0.2)
-            # points_set[:, :, 0:3] = jittered_data
-            # points_set[:, :1024, :] = provider.random_point_dropout_v2(points_set[:, :1024, :])
+            jittered_data, j_scale = provider.random_scale_point_cloud(points_set[:, :, 0:3], scale_low=2.0 / 3,
+                                                                     scale_high=3 / 2.0)
+            jittered_data, j_shift = provider.shift_point_cloud(jittered_data, shift_range=0.2)
+            points_set[:, :, 0:3] = jittered_data
+            points_set[:, :1024, :] = provider.random_point_dropout_v2(points_set[:, :1024, :])
             points = torch.Tensor(points_set[:, :1024, :])
             target = torch.Tensor(points_set[:, 1024, :])
             points = points.transpose(2, 1)
             points, target = points.cuda(), target.cuda()
             optimizer.zero_grad()
             estimator = estimator.eval()
-            # pred = classifier(points[:, :3, :], points[:, 3:, :])
             pred = estimator(points[:, :3, :], None)
             loss = F.mse_loss(pred, target)
+            real_t = (((target - j_shift) / j_scale) * n_size) + n_cent
+            real_p = (((pred - j_shift) / j_scale) * n_size) + n_cent
 
             # import open3d as o3d
             # vis_point = points[0, :, :].data.cpu().numpy().T
@@ -175,7 +176,7 @@ def main(args):
             # print(vis_dist)
             # o3d.draw_geometries([vis_point_cloud, vis_target_cloud, vis_pred_cloud, vis_cent_cloud])
 
-            diff = pred - target
+            diff = real_p - real_t
             distance = torch.norm(diff, dim=1)
             correct = torch.sum(distance < 0.05)
             mean_correct.append(correct.item() / float(points.size()[0]))

@@ -10,9 +10,9 @@ warnings.filterwarnings('ignore')
 def pc_normalize(pc):
     centroid = np.mean(pc, axis=0)
     pc = pc - centroid
-    # m = np.max(np.sqrt(np.sum(pc ** 2, axis=1)))
-    # pc = pc / m
-    return pc
+    m = np.max(np.sqrt(np.sum(pc ** 2, axis=1)))
+    pc = pc / m
+    return pc, centroid, m
 
 
 def farthest_point_sample(point, npoint):
@@ -72,12 +72,12 @@ class TranslationDataLoader(Dataset):
             if len(self.cache) < self.cache_size:
                 self.cache[index] = point_set
 
-        point_set[:, 0:3] = pc_normalize(point_set[:, 0:3])
+        point_set[:, 0:3], centroid, m = pc_normalize(point_set[:, 0:3])
 
         if not self.normal_channel:
             point_set = point_set[:, 0:3]
 
-        return point_set
+        return point_set, centroid, m
 
     def __getitem__(self, index):
         return self._get_item(index)
