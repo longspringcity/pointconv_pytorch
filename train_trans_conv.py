@@ -113,7 +113,7 @@ def main(args):
     global_epoch = 0
     global_step = 0
     best_tst_accuracy = 0.0
-    train_steps = 30
+    train_steps = 10
     test_steps = 10
     blue = lambda x: '\033[94m' + x + '\033[0m'
 
