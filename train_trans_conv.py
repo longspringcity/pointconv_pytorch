@@ -155,6 +155,8 @@ def main(args):
             j_shift = torch.Tensor(j_shift).cuda()
             print(target.shape)
             print(j_scale.shape)
+            print(n_size.shape)
+            print(n_cent.shape)
             real_t = (((target - j_shift) / j_scale) * n_size) + n_cent
             real_p = (((pred - j_shift) / j_scale) * n_size) + n_cent
 
