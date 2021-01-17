@@ -148,9 +148,11 @@ def main(args):
             points = points.transpose(2, 1)
             points, target = points.cuda(), target.cuda()
             optimizer.zero_grad()
-            estimator = estimator.eval()
+            estimator = estimator.train()
             pred = estimator(points[:, :3, :], None)
             loss = F.mse_loss(pred, target)
+            j_scale = torch.Tensor(j_scale)
+            j_shift = torch.Tensor(j_shift)
             real_t = (((target - j_shift) / j_scale) * n_size) + n_cent
             real_p = (((pred - j_shift) / j_scale) * n_size) + n_cent
 
